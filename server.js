@@ -23,7 +23,7 @@ const upload = multer({
     s3: s3,
     bucket: 'beomgeun-bucket',
     key: function (요청, file, cb) {
-      cb(null, Date.now().toString()) //업로드시 파일명 변경가능
+      cb(null, Date.now().toString()) //업로드시 파일명
     }
   })
 })
@@ -82,13 +82,14 @@ app.use(express.json()) // req.body 사용하기 위해서
 app.use(express.urlencoded({extended:true})) // #
 
 
+let connectDB = require('./database.js')
+
 let db
-const url = process.env.DB_URL
-new MongoClient(url).connect().then((client)=>{ // Mongo DB 연결
+connectDB.then((client)=>{ // Mongo DB 연결
   console.log('DB연결성공')
   db = client.db('chat')
 
-  app.listen(8080, () => {
+  app.listen(process.env.PORT, () => {
     console.log('### http://localhost:8080 에서 서버 실행중 ###')
   })
 
@@ -125,14 +126,14 @@ app.get('/time', (req, res) => {
 app.get('/write', (req, res) => {
   res.render('write.ejs')
 })
-app.post('/add', async (req,res)=>{
+app.post('/add', upload.single('img1'), async (req,res)=>{
   console.log(req.body)
 
   try {
     if (req.body.title == ''){
       res.send('제목 입력 X')
     } else {
-      await db.collection('post').insertOne({title : req.body.title, content : req.body.content})
+      await db.collection('post').insertOne({title : req.body.title, content : req.body.content, img : req.file.location})
       res.redirect('/list')
     }
   } catch(e) {
@@ -209,3 +210,5 @@ app.post('/register', async (req, res) => {
     res.status(500).send('회원가입 중 오류가 발생했습니다.');
   }
 });
+
+app.use('/shop', require('./routes/shop.js')) // 파일 분리 연습
