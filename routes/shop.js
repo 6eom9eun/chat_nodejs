@@ -1,10 +1,8 @@
 const router = require('express').Router()
 
 let connectDB = require('./../database.js')
-
 let db
 connectDB.then((client)=>{ // Mongo DB 연결
-  console.log('DB연결성공')
   db = client.db('chat')
 }).catch((err)=>{
   console.log(err)

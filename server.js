@@ -81,7 +81,6 @@ app.set('view engine', 'ejs') // ejs 세팅
 app.use(express.json()) // req.body 사용하기 위해서
 app.use(express.urlencoded({extended:true})) // #
 
-
 let connectDB = require('./database.js')
 
 let db
@@ -101,114 +100,11 @@ app.get('/', (req, res) => {
   res.render('index.ejs')
 })
 
-app.get('/news', (req, res) => {
-    res.send('오늘 비옴')
-})
-
-// app.get('/list', async (req, res) => {
-//   let rs = await db.collection('post').find().toArray()
-//   res.render('list.ejs', {posts : rs})
-// })
-
-app.get('/list/:id', async (req, res) => {
-  let rs = await db.collection('post').find().skip((req.params.id-1) * 5).limit(5).toArray()
-  res.render('list.ejs', {posts : rs})
-})
-app.get('/list/next/:id', async (req, res) => {
-  let rs = await db.collection('post').find({_id:{$gt : new ObjectId(req.params.id)}}).limit(5).toArray()
-  res.render('list.ejs', {posts : rs})
-})
-
 app.get('/time', (req, res) => {
   res.render('time.ejs', {time : new Date()})
 })
 
-app.get('/write', (req, res) => {
-  res.render('write.ejs')
-})
-app.post('/add', upload.single('img1'), async (req,res)=>{
-  console.log(req.body)
 
-  try {
-    if (req.body.title == ''){
-      res.send('제목 입력 X')
-    } else {
-      await db.collection('post').insertOne({title : req.body.title, content : req.body.content, img : req.file.location})
-      res.redirect('/list')
-    }
-  } catch(e) {
-    console.log(e)
-    res.status(500).send('서버에러')
-  }
-})
-
-app.get('/detail/:id', async(req, res)=>{
-  try {
-    let rs = await db.collection('post').findOne({_id : new ObjectId(req.params.id)})
-    console.log(req.params)
-    if (rs == null) {
-      res.status(400).send('이상한 url')      
-    }
-    res.render('detail.ejs', {rs : rs})
-  } catch(e) {
-    console.log(e)
-    res.status(400).send('이상한 url')
-  }
-})
-app.get('/edit/:id', async (req, res)=>{
-  let rs = await db.collection('post').findOne({_id : new ObjectId(req.params.id)})
-  console.log(rs)
-  res.render('edit.ejs', {post : rs})
-})
-app.put('/edit', async (req, res)=>{
-  await db.collection('post').updateOne({_id : new ObjectId(req.body.id)},
-  {$set : {title: req.body.title, content : req.body.content}}
-  )
-  console.log(req.body)
-  res.redirect('/list')
-})
-app.delete('/delete', async (req, res)=>{
-  console.log(req.query)
-  await db.collection('post').deleteOne({_id : new ObjectId(req.query.docid)})
-  res.send('삭제완료')
-})
-
-app.get('/login', async (req, res) => {
-  console.log(req.user)
-  res.render('login.ejs')
-})
-app.post('/login', async (req, res, next) => {
-  passport.authenticate('local', (error, user, info) => {
-      if (error) return res.status(500).json(error)
-      if (!user) return res.status(401).json(info.message)
-      req.logIn(user, (err) => {
-        if (err) return next(err)
-        res.redirect('/')
-      })
-  })(req, res, next)
-}) 
-
-app.get('/register', (req, res)=> {
-  res.render('register.ejs')
-})
-app.post('/register', async (req, res) => {
-  const chk = await db.collection('user').findOne({ username: req.body.username });
-
-  if (chk) {
-    return res.status(409).send('이미 존재하는 사용자 이름입니다.');
-  }
-
-  try {
-    let hash = await bcrypt.hash(req.body.password, 10);
-    await db.collection('user').insertOne({
-      username: req.body.username,
-      password: hash
-    });
-    res.redirect('/');
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('회원가입 중 오류가 발생했습니다.');
-  }
-});
-
-app.use('/shop', require('./routes/shop.js')) // 파일 분리 연습
+app.use('/user', require('./routes/user.js'));
+app.use('/post', require('./routes/post.js'));
+app.use('/shop', require('./routes/shop.js')); // 파일 분리 연습
