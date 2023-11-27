@@ -1,5 +1,4 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router()
 const { ObjectId } = require('mongodb');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
@@ -49,19 +48,23 @@ router.get('/write', (req, res) => {
 });
 
 router.post('/add', upload.single('img1'), async (req, res) => {
-  console.log(req.body);
-  try {
-    if (req.body.title === '') {
-      res.send('제목 입력 X');
-    } else {
-      await db.collection('post').insertOne({ title: req.body.title, content: req.body.content, img: req.file.location });
-      res.redirect('/list');
+    console.log(req.body);
+    try {
+      if (req.body.title === '') {
+        res.send('제목 입력 X');
+      } else {
+        let imgLocation = req.file ? req.file.location : null;
+        
+        await db.collection('post').insertOne({ title: req.body.title, content: req.body.content, img: imgLocation });
+        
+        res.redirect('/post/list/:id');
+      }
+    } catch (e) {
+      console.log(e);
+      res.status(500).send('서버에러');
     }
-  } catch (e) {
-    console.log(e);
-    res.status(500).send('서버에러');
-  }
-});
+  });
+  
 
 router.get('/detail/:id', async (req, res) => {
   try {
@@ -88,7 +91,7 @@ router.put('/edit', async (req, res) => {
     { $set: { title: req.body.title, content: req.body.content } }
   );
   console.log(req.body);
-  res.redirect('/list');
+  res.redirect('/post/list');
 });
 
 router.delete('/delete', async (req, res) => {

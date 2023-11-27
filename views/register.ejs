@@ -10,7 +10,7 @@
     <body class="grey-bg">
         <%- include('nav.ejs') %>
     
-        <form class="form-box" action="/register" method="POST" onsubmit="return validateForm()">
+        <form class="form-box" action="/user/register" method="POST" onsubmit="return validateForm()">
             <h4>가입</h4>
             <input name="username" required>
             <input name="password" id="password" type="password" required>
