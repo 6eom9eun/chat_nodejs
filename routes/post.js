@@ -100,4 +100,10 @@ router.delete('/delete', async (req, res) => {
   res.send('삭제완료');
 });
 
+router.get('/search', async (req, res)=>{
+  console.log(req.query.val)
+  let rs = await db.collection('post').find({title: {$regex : req.query.val}}).toArray()
+  res.render('search.ejs', { posts :rs })
+})
+
 module.exports = router;
