@@ -102,7 +102,24 @@ router.delete('/delete', async (req, res) => {
 
 router.get('/search', async (req, res)=>{
   console.log(req.query.val)
-  let rs = await db.collection('post').find({title: {$regex : req.query.val}}).toArray()
+  // let rs = await db.collection('post').find({title: {$regex : req.query.val}}).toArray()
+
+  // let rs = await db.collection('post').find({$text : {$search : req.query.val}}).explain('executionStats') // 인덱스로 검색, 성능평가.
+  // console.log(rs)
+
+  // search index 사용 !
+  let 검색조건 = [
+    {$search : {
+      index : 'title_index',
+      text : { query : req.query.val, path : 'title' } // index 인덱스 이름, query 검색어, path db필드
+    }},
+    // { $sort : { _id : 1 }},  // 정렬 - {db필드: 1&-1}
+    // { $limit : 10 }, // 결과 수 제한
+    // { $skip : 10 }, // 건너뛰기
+    // { $project : { title : 1 }} // 필드 숨기기, 0이면 숨기고 1이면 보여주기
+    // 등등
+  ]
+  let rs = await db.collection('post').aggregate(검색조건).toArray()
   res.render('search.ejs', { posts :rs })
 })
 
