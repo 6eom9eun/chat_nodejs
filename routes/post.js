@@ -44,7 +44,11 @@ router.get('/list/next/:id', async (req, res) => {
 });
 
 router.get('/write', (req, res) => {
-  res.render('write.ejs');
+  if (req.isAuthenticated()) {
+    res.render('write.ejs');
+  } else {
+    res.redirect('/user/login');
+  }
 });
 
 router.post('/add', upload.single('img1'), async (req, res) => {
@@ -53,9 +57,12 @@ router.post('/add', upload.single('img1'), async (req, res) => {
       if (req.body.title === '') {
         res.send('제목 입력 X');
       } else {
-        let imgLocation = req.file ? req.file.location : null;
-        
-        await db.collection('post').insertOne({ title: req.body.title, content: req.body.content, img: imgLocation });
+        await db.collection('post').insertOne({ 
+          title: req.body.title, 
+          content: req.body.content, 
+          img: req.file ? req.file.location : '',
+          user : req.user._id,
+          username : req.user.username});
         
         res.redirect('/post/list/:id');
       }
@@ -95,10 +102,23 @@ router.put('/edit', async (req, res) => {
 });
 
 router.delete('/delete', async (req, res) => {
-  console.log(req.query);
-  await db.collection('post').deleteOne({ _id: new ObjectId(req.query.docid) });
-  res.send('삭제완료');
+  try {
+    const result = await db.collection('post').findOneAndDelete({
+      _id: new ObjectId(req.query.docid),
+      user: new ObjectId(req.user._id)
+    });
+
+    if (result.value) {
+      res.status(200).send('삭제완료');
+    } else {
+      res.status(404).send('해당 문서를 찾을 수 없습니다.');
+    }
+  } catch (error) {
+    console.error('삭제 오류:', error);
+    res.status(500).send('삭제 중에 오류가 발생했습니다.');
+  }
 });
+
 
 router.get('/search', async (req, res)=>{
   console.log(req.query.val)

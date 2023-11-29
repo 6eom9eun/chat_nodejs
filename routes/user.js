@@ -50,4 +50,14 @@ router.post('/register', async (req, res) => {
   }
 });
 
+router.get('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('로그아웃 중 오류가 발생했습니다.');
+    }
+    res.redirect('/');
+  });
+});
+
 module.exports = router;
