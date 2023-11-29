@@ -75,12 +75,13 @@ router.post('/add', upload.single('img1'), async (req, res) => {
 
 router.get('/detail/:id', async (req, res) => {
   try {
+    let rs2 = await db.collection('comment').find({parentId : new ObjectId(req.params.id)}).toArray()
     let rs = await db.collection('post').findOne({ _id: new ObjectId(req.params.id) });
     console.log(req.params);
     if (rs == null) {
       res.status(400).send('이상한 url');
     }
-    res.render('detail.ejs', { rs: rs });
+    res.render('detail.ejs', { rs: rs, rs2 : rs2 });
   } catch (e) {
     console.log(e);
     res.status(400).send('이상한 url');
@@ -141,6 +142,16 @@ router.get('/search', async (req, res)=>{
   ]
   let rs = await db.collection('post').aggregate(검색조건).toArray()
   res.render('search.ejs', { posts :rs })
+})
+
+router.post('/comment', async(req, res)=>{
+  let rs = await db.collection('comment').insertOne({
+    content : req.body.content,
+    writerId : new ObjectId(req.user._id),
+    writer : req.user.username,
+    parentId : new ObjectId(req.body.parentId)
+  })
+  res.redirect('back')
 })
 
 module.exports = router;
