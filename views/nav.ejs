@@ -1,5 +1,5 @@
 <nav id="navbar-example2" class="navbar bg-body-tertiary px-3 mb-3">
-  <a class="navbar-brand" href="/">Chat</a>
+  <a class="navbar-brand" href="/">Chat<%- user ? ' ' + user.username + '님, 오늘 하루도 화이팅 하세요.' : '' %></a>
   <ul class="nav nav-pills">
     <li class="nav-item">
       <li><a class="dropdown-item" href="/post/list/:0">List</a></li>

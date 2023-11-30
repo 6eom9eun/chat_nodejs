@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link href="/main.css" rel="stylesheet">
+</head>
+<body class="grey-bg">
+    <%- include('nav.ejs') %>
+
+    <%= JSON.stringify(rs) %>
+    <div class="detail-bg">
+        <div class="chat-screen">
+          <div class="chat-box"><span>안녕하세요</span></div>
+          <div class="chat-box"><span>안녕하세요</span></div>
+          <div class="chat-box mine"><span>안녕하세요</span></div>
+        </div>
+      </div>
+      <div class="chat-form">
+        <input class="chat-input">
+        <button class="chat-button">전송</button>
+  </div> 
+
+  <script src="https://cdn.jsdelivr.net/npm/socket.io@4.7.2/client-dist/socket.io.min.js"></script>
+  <script>
+    const socket = io() 
+    socket.emit('ask-join', '<%= rs._id %>')
+
+    document.querySelector('.chat-button').addEventListener('click', function(){
+        let message = document.querySelector('.chat-input').value
+        socket.emit('message-send', {msg : message, room : '<%= rs._id %>'})
+    })
+
+    socket.on('message-broadcast', (data)=>{
+    document.querySelector('.chat-screen').insertAdjacentHTML('beforeend', `<div class="chat-box"><span>${data}</span></div>`)
+    })
+
+  </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script> 
+  </body>
+</html>

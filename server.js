@@ -6,6 +6,13 @@ const bcrypt = require('bcrypt') // npm i bcrypt : 비번 해싱
 const MongoStore = require('connect-mongo') // npm i connect-mongo
 require('dotenv').config() // npm u dotenv 환경변수보관
 
+// npm install socket.io@4 // 실제 서비스는 DB adapter와 함께...
+const { createServer } = require('http')
+const { Server } = require('socket.io')
+const server = createServer(app)
+const io = new Server(server) 
+// **************
+
 // multer : npm install multer multer-s3 @aws-sdk/client-s3 => S3 쉽게 다룰 수 있도록 하는 라이브러리
 const { S3Client } = require('@aws-sdk/client-s3')
 const multer = require('multer')
@@ -88,7 +95,7 @@ connectDB.then((client)=>{ // Mongo DB 연결
   console.log('DB연결성공')
   db = client.db('chat')
 
-  app.listen(process.env.PORT, () => {
+  server.listen(process.env.PORT, () => {
     console.log('### http://localhost:8080 에서 서버 실행중 ###')
   })
 
@@ -96,12 +103,49 @@ connectDB.then((client)=>{ // Mongo DB 연결
   console.log(err)
 })
 
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
+
+
 app.get('/', (req, res) => {
-  res.render('index.ejs')
+  res.render('index.ejs', { user: req.user });
 })
 
 app.get('/time', (req, res) => {
   res.render('time.ejs', {time : new Date()})
+})
+
+app.get('/chat/request', async (req, res)=>{
+  await db.collection('chatroom').insertOne({
+    member : [req.user._id, new ObjectId(req.query.writerId)],
+    date : new Date()
+  })
+  res.redirect('/chat/list')
+})
+
+app.get('/chat/list', async (req, res)=>{
+  let rs = await db.collection('chatroom').find({
+    member : req.user._id }).toArray()
+  res.render('chatList.ejs', {rs : rs})
+})
+
+app.get('/chat/detail/:id', async (req, res)=>{
+  let rs = await db.collection('chatroom').findOne({ 
+    _id : new ObjectId(req.params.id)})
+  res.render('chatDetail.ejs', {rs : rs})
+})
+
+
+io.on('connection', (socket) =>{
+  socket.on('ask-join', (data)=>{
+    socket.join(data)
+  })
+  socket.on('message-send', (data)=>{
+    console.log(data)
+    io.to(data.room).emit('message-broadcast', data.msg)
+  })
 })
 
 
