@@ -1,23 +1,39 @@
-<nav id="navbar-example2" class="navbar bg-body-tertiary px-3 mb-3">
-  <a class="navbar-brand" href="/">Chat<%- user ? ' ' + user.username + '님, 오늘 하루도 화이팅 하세요.' : '' %></a>
-  <ul class="nav nav-pills">
-    <li class="nav-item">
-      <li><a class="dropdown-item" href="/post/list/:0">List</a></li>
-    </li>
-    <li class="nav-item">
-      <li><a class="dropdown-item" href="/post/write">Write</a></li>
-    </li>
-    <li class="nav-item">
-      <li><a class="dropdown-item" href="/time">time</a></li>
-    </li>
-    <li class="nav-item">
-      <li><a class="dropdown-item" href="/user/login">login</a></li>
-    </li>
-    <li class="nav-item">
-      <li><a class="dropdown-item" href="/user/register">register</a></li>
-      
-      <li class="nav-item">
-      <a class="nav-link" href="/user/logout">Logout</a>
-    </li>
-  </ul>
+<nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Chat <%- user ? ' ' + user.username + '님, 오늘 하루도 화이팅 하세요.' : '' %></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarColor02">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link active" href="/">Home
+            <span class="visually-hidden">(current)</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/post/list/:0">List</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/post/write">Write</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/time">Time</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">User</a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/user/login">Login</a>
+            <a class="dropdown-item" href="/user/register">Register</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/user/logout">Logout</a>
+          </div>
+        </li>
+      </ul>
+      <form class="d-flex">
+        <input class="form-control me-sm-2" type="search" placeholder="Search">
+        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
 </nav>

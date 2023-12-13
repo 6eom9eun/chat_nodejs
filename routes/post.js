@@ -8,8 +8,18 @@ const passport = require('passport');
 
 const connectDB = require('./../database.js');
 let db;
+let changeStream
+
 connectDB.then((client) => {
   db = client.db('chat');
+
+  let 조건 = [
+    { $match : { operationType : 'insert'}} // 글 발행 시에만 감시
+ // { $match : { 'fullDocument.title' : '안녕'}} // '안녕' 타이틀만 변동 감지
+  ]
+
+  changeStream = db.collection('post').watch(조건) // collection 변동사항 감시
+  
 }).catch((err) => {
   console.log(err);
 });
@@ -152,6 +162,25 @@ router.post('/comment', async(req, res)=>{
     parentId : new ObjectId(req.body.parentId)
   })
   res.redirect('back')
+})
+
+router.get('/stream/list', (req,res)=>{ // Server sent events
+  res.writeHead(200, {
+    "Connection": "keep-alive",
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache",
+  });
+  
+  // setInterval(()=>{ // 1초마다 계속 보내줌
+  //   res.write('event: msg\n')
+  //   res.write('data: ㅎ2\n\n')
+  // }, 1000)
+
+  changeStream.on('change', (rs)=>{
+    console.log(rs.fullDocument) // 변동시 변동사항 볼 수 있음.
+    res.write('event: msg\n')
+    res.write(`data: ${JSON.stringify(rs.fullDocument)}\n\n`)
+  })
 })
 
 module.exports = router;

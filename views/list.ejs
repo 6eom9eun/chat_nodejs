@@ -21,7 +21,7 @@
         <a href="/post/edit/<%= posts[i]._id %>">✏️</a>
         <span class="delete" data-id="<%= posts[i]._id %>">🗑️</span>
       </h4>
-        <p><%= posts[i].content %></p>
+      <p>내용 : <%= posts[i].content %></p><p>작성자 : <%= posts[i].username %></p>
       </div>
       <% } %>
     </div>
@@ -58,6 +58,15 @@
             });
         });
       }
+    </script>
+
+    <script>
+      let eventSource = new EventSource('/post/stream/list')
+      eventSource.addEventListener('msg', function(e){
+        console.log(e.data)
+        let newPost = JSON.parse(e.data)
+        document.querySelector('.white-bg').insertAdjacentHTML('afterbegin', `<div class="list-box"><h4>${newPost.title}</h4></div>`)
+      })
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script> 

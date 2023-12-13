@@ -12,8 +12,8 @@
     
         <form class="form-box" action="/user/register" method="POST" onsubmit="return validateForm()">
             <h4>가입</h4>
-            <input name="username" required>
-            <input name="password" id="password" type="password" required>
+            <input name="username" placeholder="아이디" required>
+            <input name="password" id="password" type="password"placeholder="비밀번호" required>
             <input name="confirmPassword" id="confirmPassword" type="password" placeholder="비밀번호 확인" required>
             <span id="passwordError" style="color: red;"></span>
             <button type="submit">전송</button>
