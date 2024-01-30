@@ -48,6 +48,7 @@
 <br>
 
 - AWS 배포
+ - Elastic beanstalk 이용해 배포
 - AWS S3 이미지 호스팅
   
   <img width="455" alt="image" src="https://github.com/6eom9eun/chat_nodejs/assets/104510730/562d962a-f6b7-41c3-ac3e-04169b80038a">
