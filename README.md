@@ -1,4 +1,7 @@
-개발 내용
+<img width="1509" alt="image" src="https://github.com/6eom9eun/chat_nodejs/assets/104510730/f785d193-1220-4d28-b540-a7787129bd09">
+<br>
+
+# 개발 내용
 
 - Node.js와 Express로 RESTful API 만들기
 <br>
